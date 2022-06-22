@@ -1,3 +1,5 @@
+using SurveyMe.Common.Exceptions;
+
 namespace Surveys.Api.Handlers;
 
 public class AuthorizeHandler : DelegatingHandler
@@ -16,7 +18,7 @@ public class AuthorizeHandler : DelegatingHandler
 
         if (string.IsNullOrEmpty(header))
         {
-            //TODO: throw exception
+            throw new UnauthorizedException("Token not found");
         }
         
         request.Headers.Add("Authorization", header);
