@@ -13,6 +13,6 @@ public sealed class Survey
     public Guid AuthorId { get; set; }
 
     public ICollection<Question> Questions { get; set; }
-
-    public bool RequirePersonInfo { get; set; }
+    
+    public Guid OptionsId { get; set; }
 }

@@ -3,7 +3,7 @@ using System.Text.Json;
 using System.Text.Unicode;
 using Microsoft.AspNetCore.WebUtilities;
 using SurveyMe.Common.Exceptions;
-using Surveys.Api.Models.Response.Errors;
+using SurveyMe.Error.Models.Response;
 
 namespace Surveys.Api.Middleware;
 

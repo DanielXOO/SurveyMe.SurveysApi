@@ -3,11 +3,13 @@ using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SurveyMe.Common.Exceptions;
+using SurveyMe.Error.Models.Response;
+using SurveyMe.SurveyPersonApi.Models.Response.Options;
 using Surveys.Api.Models.Request.Queries;
 using Surveys.Api.Models.Request.Surveys;
-using Surveys.Api.Models.Response.Errors;
 using Surveys.Api.Models.Response.Pages;
 using Surveys.Api.Models.Response.Surveys;
+using Surveys.Models.SurveyOptions;
 using Surveys.Models.Surveys;
 using Surveys.Services.Abstracts;
 
@@ -22,13 +24,16 @@ namespace Surveys.Api.Controllers;
 public sealed class SurveysController : Controller
 {
     private readonly ISurveysService _surveyService;
+    
     private readonly IMapper _mapper;
 
+    private readonly ISurveyPersonService _surveyPersonService;
 
-    public SurveysController(ISurveysService surveyService, IMapper mapper)
+    public SurveysController(ISurveysService surveyService, IMapper mapper, ISurveyPersonService surveyPersonService)
     {
         _surveyService = surveyService;
         _mapper = mapper;
+        _surveyPersonService = surveyPersonService;
     }
 
 
@@ -43,12 +48,37 @@ public sealed class SurveysController : Controller
         
         var surveys = await _surveyService
             .GetSurveysAsync(request.Page, request.PageSize, request.SortOrder, request.NameSearchTerm);
+
+        var options = new List<SurveyOptions>();
+
+        foreach (var survey in surveys.Items)
+        {
+            var option = await _surveyPersonService.GetSurveyPersonOptionsAsync(survey.OptionsId);
+            options.Add(option);
+        }
+
+        var surveyResponse = surveys.Items.Join(options,
+            survey => survey.Id,
+            option => option.SurveyId,
+            (survey, option) =>
+            {
+                var surveyResponse = _mapper.Map<SurveyResponseModel>(survey);
+                surveyResponse.Options = _mapper.Map<SurveyOptionsResponseModel>(option);
+
+                return surveyResponse;
+            }).ToList();
         
         var pageResponse = new PageResponseModel<SurveyResponseModel>
         {
             NameSearchTerm = request.NameSearchTerm,
             SortOrder = request.SortOrder,
-            Page = _mapper.Map<PagedResultResponseModel<SurveyResponseModel>>(surveys)
+            Page = new PagedResultResponseModel<SurveyResponseModel>
+            {
+                CurrentPage = surveys.CurrentPage,
+                PageSize = surveys.PageSize,
+                TotalItems = surveys.TotalItems,
+                Items = surveyResponse
+            }
         };
 
         if (surveys.TotalPages < surveys.CurrentPage && surveys.TotalPages > 0)
@@ -59,11 +89,11 @@ public sealed class SurveysController : Controller
         return Ok(pageResponse);
     }
     
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BaseErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(BaseErrorResponse))]
     [HttpPost]
-    public async Task<IActionResult> AddSurvey([FromBody] SurveyAddRequestModel surveyModel)
+    public async Task<IActionResult> AddSurvey([FromBody] SurveyAddRequestModel surveyRequest)
     {
         var authorId = Guid.Parse(HttpContext.User.GetSubjectId());
 
@@ -77,11 +107,22 @@ public sealed class SurveysController : Controller
             throw new BadRequestException("Invalid data", errors);
         }
 
-        var survey = _mapper.Map<Survey>(surveyModel);
+        var surveyId = Guid.NewGuid();
+        
+        var options = _mapper.Map<SurveyOptions>(surveyRequest.Options);
 
+        options.SurveyId = surveyId;
+        
+        var optionsId = await _surveyPersonService.AddOptionsAsync(options);
+        
+        var survey = _mapper.Map<Survey>(surveyRequest);
+        
+        survey.OptionsId = optionsId;
+        survey.Id = surveyId;
+        
         await _surveyService.AddSurveyAsync(survey, authorId);
 
-        return Ok();
+        return NoContent();
     }
     
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SurveyResponseModel))]
@@ -90,8 +131,11 @@ public sealed class SurveysController : Controller
     public async Task<IActionResult> GetSurvey(Guid id)
     {
         var survey = await _surveyService.GetSurveyByIdAsync(id);
-
         var surveyResponseModel = _mapper.Map<SurveyResponseModel>(survey);
+        
+        var options = await _surveyPersonService.GetSurveyPersonOptionsAsync(survey.OptionsId);
+        var optionsResponse = _mapper.Map<SurveyOptionsResponseModel>(options);
+        surveyResponseModel.Options = optionsResponse;
         
         return Ok(surveyResponseModel);
     }
@@ -103,7 +147,8 @@ public sealed class SurveysController : Controller
     public async Task<IActionResult> DeleteSurvey(Guid id)
     {
         var survey = await _surveyService.GetSurveyByIdAsync(id);
-        
+
+        await _surveyPersonService.DeleteSurveyPersonOptionsAsync(survey.OptionsId);
         await _surveyService.DeleteSurveyAsync(survey);
         
         return NoContent();
@@ -114,9 +159,9 @@ public sealed class SurveysController : Controller
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(BaseErrorResponse))]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(BaseErrorResponse))]
     [HttpPatch("{id:guid}")]
-    public async Task<IActionResult> EditSurvey([FromBody] SurveyEditRequestModel surveyModel, Guid id)
+    public async Task<IActionResult> EditSurvey([FromBody] SurveyEditRequestModel surveyRequest, Guid id)
     {
-        if (surveyModel.Id != id)
+        if (surveyRequest.Id != id)
         {
             throw new BadRequestException("Route id and request id do not match");
         }
@@ -131,9 +176,12 @@ public sealed class SurveysController : Controller
             throw new ForbidException("Action denied");
         }
 
-        _mapper.Map(surveyModel, survey);
+        _mapper.Map(surveyRequest, survey);
 
+        var options = _mapper.Map<SurveyOptions>(surveyRequest);
+        
         await _surveyService.UpdateSurveyAsync(survey);
+        await _surveyPersonService.EditSurveyPersonOptionsAsync(options);
 
         return NoContent();
     }
