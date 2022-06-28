@@ -1,4 +1,4 @@
-using SurveyMe.SurveyPersonApi.Models.Request.Options;
+using SurveyMe.SurveyPersonApi.Models.Request.Options.Survey;
 using Surveys.Api.Models.Request.Questions;
 
 namespace Surveys.Api.Models.Request.Surveys;

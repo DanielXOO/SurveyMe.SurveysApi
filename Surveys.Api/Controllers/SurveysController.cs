@@ -1,11 +1,10 @@
 ﻿using AutoMapper;
 using Duende.IdentityServer.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using SurveyMe.Common.Exceptions;
 using SurveyMe.Error.Models.Response;
-using SurveyMe.SurveyPersonApi.Models.Response.Options;
+using SurveyMe.SurveyPersonApi.Models.Response.Options.Survey;
 using Surveys.Api.Models.Request.Queries;
 using Surveys.Api.Models.Request.Surveys;
 using Surveys.Api.Models.Response.Pages;

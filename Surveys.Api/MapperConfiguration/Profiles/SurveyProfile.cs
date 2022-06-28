@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using SurveyMe.SurveyPersonApi.Models.Request.Options;
-using SurveyMe.SurveyPersonApi.Models.Response.Options;
+using SurveyMe.SurveyPersonApi.Models.Request.Options.Survey;
+using SurveyMe.SurveyPersonApi.Models.Response.Options.Survey;
 using Surveys.Api.Models.Request.Surveys;
 using Surveys.Api.Models.Response.Surveys;
 using Surveys.Models.Surveys;

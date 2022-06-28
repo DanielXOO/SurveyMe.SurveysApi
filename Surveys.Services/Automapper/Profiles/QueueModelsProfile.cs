@@ -2,7 +2,6 @@
 using SurveyMe.QueueModels;
 using Surveys.Models.Options;
 using Surveys.Models.Questions;
-using Surveys.Models.SurveyOptions;
 using Surveys.Models.Surveys;
 
 namespace Surveys.Services.Automapper.Profiles;
