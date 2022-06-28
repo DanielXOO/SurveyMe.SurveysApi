@@ -14,5 +14,5 @@ public sealed class Survey
 
     public ICollection<Question> Questions { get; set; }
     
-    public Guid OptionsId { get; set; }
+    public Guid SurveyOptionId { get; set; }
 }

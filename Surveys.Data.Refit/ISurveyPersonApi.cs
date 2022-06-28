@@ -1,6 +1,6 @@
 using Refit;
-using SurveyMe.SurveyPersonApi.Models.Request.Options;
-using SurveyMe.SurveyPersonApi.Models.Response.Options;
+using SurveyMe.SurveyPersonApi.Models.Request.Options.Survey;
+using SurveyMe.SurveyPersonApi.Models.Response.Options.Survey;
 
 namespace Surveys.Data.Refit;
 

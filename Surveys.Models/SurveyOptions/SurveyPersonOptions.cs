@@ -1,6 +1,6 @@
 namespace Surveys.Models.SurveyOptions;
 
-public sealed class SurveyOptions
+public sealed class SurveyPersonOptions
 {
     public Guid Id { get; set; }
     

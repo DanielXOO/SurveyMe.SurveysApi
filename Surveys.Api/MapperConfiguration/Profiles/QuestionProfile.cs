@@ -28,5 +28,9 @@ public sealed class QuestionProfile : Profile
 
         CreateMap<QuestionResponseModel, Question>()
             .ReverseMap();
+
+        CreateMap<QuestionAddRequestModel, QuestionResponseModel>();
+
+        CreateMap<QuestionOptionAddRequestModel, QuestionOptionResponseModel>();
     }
 }

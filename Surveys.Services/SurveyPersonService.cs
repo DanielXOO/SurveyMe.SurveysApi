@@ -1,7 +1,7 @@
 using System.Text.Json;
 using AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
-using SurveyMe.SurveyPersonApi.Models.Request.Options;
+using SurveyMe.SurveyPersonApi.Models.Request.Options.Survey;
 using Surveys.Data.Refit;
 using Surveys.Models.SurveyOptions;
 using Surveys.Services.Abstracts;
@@ -25,19 +25,19 @@ public class SurveyPersonService : ISurveyPersonService
     }
 
     
-    public async Task<SurveyOptions> GetSurveyPersonOptionsAsync(Guid id)
+    public async Task<SurveyPersonOptions> GetSurveyPersonOptionsAsync(Guid id)
     {
         var serializedOptions = await _cache.GetStringAsync(id.ToString());
 
         if (!string.IsNullOrEmpty(serializedOptions))
         {
-            var option = JsonSerializer.Deserialize<SurveyOptions>(serializedOptions);
+            var option = JsonSerializer.Deserialize<SurveyPersonOptions>(serializedOptions);
 
             return option;
         }
 
         var optionsResponse = await _surveyPersonApi.GetSurveyPersonOptionsAsync(id);
-        var options = _mapper.Map<SurveyOptions>(optionsResponse);
+        var options = _mapper.Map<SurveyPersonOptions>(optionsResponse);
         
         serializedOptions = JsonSerializer.Serialize(options);
         await _cache.SetStringAsync(options.Id.ToString(), serializedOptions);
@@ -45,14 +45,14 @@ public class SurveyPersonService : ISurveyPersonService
         return options;
     }
 
-    public async Task EditSurveyPersonOptionsAsync(SurveyOptions options)
+    public async Task EditSurveyPersonOptionsAsync(SurveyPersonOptions personOptions)
     {
-        var optionsRequest = _mapper.Map<SurveyOptionsEditRequestModel>(options);
+        var optionsRequest = _mapper.Map<SurveyOptionsEditRequestModel>(personOptions);
         
-        await _surveyPersonApi.EditSurveyPersonOptionsAsync(optionsRequest, optionsRequest.Id);
+        await _surveyPersonApi.EditSurveyPersonOptionsAsync(optionsRequest, optionsRequest.SurveyOptionsId);
 
-        var serializedOptions = JsonSerializer.Serialize(options);
-        await _cache.SetStringAsync(optionsRequest.Id.ToString(), serializedOptions);
+        var serializedOptions = JsonSerializer.Serialize(personOptions);
+        await _cache.SetStringAsync(optionsRequest.SurveyOptionsId.ToString(), serializedOptions);
     }
 
     public async Task DeleteSurveyPersonOptionsAsync(Guid id)
@@ -62,13 +62,13 @@ public class SurveyPersonService : ISurveyPersonService
         await _cache.RemoveAsync(id.ToString());
     }
 
-    public async Task<Guid> AddOptionsAsync(SurveyOptions options)
+    public async Task<Guid> AddOptionsAsync(SurveyPersonOptions personOptions)
     {
-        var optionsRequest = _mapper.Map<SurveyOptionsCreateRequestModel>(options);
+        var optionsRequest = _mapper.Map<SurveyOptionsCreateRequestModel>(personOptions);
         var optionsId = await _surveyPersonApi.AddOptionsAsync(optionsRequest);
         
-        var serializedOptions = JsonSerializer.Serialize(options);
-        await _cache.SetStringAsync(options.Id.ToString(), serializedOptions);
+        var serializedOptions = JsonSerializer.Serialize(personOptions);
+        await _cache.SetStringAsync(personOptions.Id.ToString(), serializedOptions);
 
         return optionsId;
     }
