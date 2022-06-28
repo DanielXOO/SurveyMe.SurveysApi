@@ -10,7 +10,7 @@ namespace Surveys.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<Guid>(
-                name: "OptionsId",
+                name: "SurveyOptionId",
                 table: "Survey",
                 type: "uniqueidentifier",
                 nullable: false,
@@ -20,7 +20,7 @@ namespace Surveys.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "OptionsId",
+                name: "SurveyOptionId",
                 table: "Survey");
         }
     }

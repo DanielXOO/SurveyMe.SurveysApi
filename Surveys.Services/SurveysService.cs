@@ -5,6 +5,7 @@ using SurveyMe.Common.Pagination;
 using SurveyMe.Common.Time;
 using SurveyMe.QueueModels;
 using Surveys.Data.Abstracts;
+using Surveys.Models.SurveyOptions;
 using Surveys.Models.Surveys;
 using Surveys.Services.Abstracts;
 
@@ -13,6 +14,8 @@ namespace Surveys.Services;
 public class SurveysService : ISurveysService
 {
     private readonly ISurveysUnitOfWork _unitOfWork;
+
+    private readonly ISurveyPersonService _surveyPersonService;
     
     private readonly ISystemClock _systemClock;
     
@@ -21,12 +24,14 @@ public class SurveysService : ISurveysService
     private readonly IMapper _mapper;
 
     
-    public SurveysService(ISurveysUnitOfWork unitOfWork, ISystemClock systemClock, IBus bus, IMapper mapper)
+    public SurveysService(ISurveysUnitOfWork unitOfWork, ISystemClock systemClock, IBus bus, IMapper mapper,
+        ISurveyPersonService surveyPersonService)
     {
         _unitOfWork = unitOfWork;
         _systemClock = systemClock;
         _bus = bus;
         _mapper = mapper;
+        _surveyPersonService = surveyPersonService;
     }
 
 
@@ -62,8 +67,16 @@ public class SurveysService : ISurveysService
         return survey;
     }
 
-    public async Task AddSurveyAsync(Survey survey, Guid authorId)
+    public async Task AddSurveyAsync(Survey survey, Guid authorId, SurveyPersonOptions personOptions)
     {
+        var surveyId = Guid.NewGuid();
+        personOptions.SurveyId = surveyId;
+
+        var optionsId = await _surveyPersonService.AddOptionsAsync(personOptions);
+        
+        survey.SurveyOptionId = optionsId;
+        survey.Id = surveyId;
+        
         survey.AuthorId = authorId;
         survey.LastChangeDate = _systemClock.UtcNow;
         await _unitOfWork.Surveys.CreateAsync(survey);

@@ -82,7 +82,7 @@ namespace Surveys.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OptionsId")
+                    b.Property<Guid>("SurveyOptionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");

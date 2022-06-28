@@ -12,7 +12,7 @@ using Surveys.Data;
 namespace Surveys.Data.Migrations
 {
     [DbContext(typeof(SurveysDbContext))]
-    [Migration("20220622092720_Add-OptionsId")]
+    [Migration("20220627073244_Add-OptionsId")]
     partial class AddOptionsId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -84,7 +84,7 @@ namespace Surveys.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("OptionsId")
+                    b.Property<Guid>("SurveyOptionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
