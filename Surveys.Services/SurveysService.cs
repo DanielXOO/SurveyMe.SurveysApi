@@ -67,12 +67,12 @@ public class SurveysService : ISurveysService
         return survey;
     }
 
-    public async Task AddSurveyAsync(Survey survey, Guid authorId, SurveyPersonOptions personOptions)
+    public async Task AddSurveyAsync(Survey survey, Guid authorId, SurveyOptions options)
     {
         var surveyId = Guid.NewGuid();
-        personOptions.SurveyId = surveyId;
+        options.SurveyId = surveyId;
 
-        var optionsId = await _surveyPersonService.AddOptionsAsync(personOptions);
+        var optionsId = await _surveyPersonService.AddOptionsAsync(options);
         
         survey.SurveyOptionId = optionsId;
         survey.Id = surveyId;

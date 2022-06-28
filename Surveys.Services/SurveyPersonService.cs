@@ -25,33 +25,33 @@ public class SurveyPersonService : ISurveyPersonService
     }
 
     
-    public async Task<SurveyPersonOptions> GetSurveyPersonOptionsAsync(Guid id)
+    public async Task<SurveyOptions> GetSurveyPersonOptionsAsync(Guid id)
     {
         var serializedOptions = await _cache.GetStringAsync(id.ToString());
 
         if (!string.IsNullOrEmpty(serializedOptions))
         {
-            var option = JsonSerializer.Deserialize<SurveyPersonOptions>(serializedOptions);
+            var option = JsonSerializer.Deserialize<SurveyOptions>(serializedOptions);
 
             return option;
         }
 
         var optionsResponse = await _surveyPersonApi.GetSurveyPersonOptionsAsync(id);
-        var options = _mapper.Map<SurveyPersonOptions>(optionsResponse);
+        var options = _mapper.Map<SurveyOptions>(optionsResponse);
         
         serializedOptions = JsonSerializer.Serialize(options);
-        await _cache.SetStringAsync(options.Id.ToString(), serializedOptions);
+        await _cache.SetStringAsync(options.SurveyOptionsId.ToString(), serializedOptions);
 
         return options;
     }
 
-    public async Task EditSurveyPersonOptionsAsync(SurveyPersonOptions personOptions)
+    public async Task EditSurveyPersonOptionsAsync(SurveyOptions options)
     {
-        var optionsRequest = _mapper.Map<SurveyOptionsEditRequestModel>(personOptions);
+        var optionsRequest = _mapper.Map<SurveyOptionsEditRequestModel>(options);
         
         await _surveyPersonApi.EditSurveyPersonOptionsAsync(optionsRequest, optionsRequest.SurveyOptionsId);
 
-        var serializedOptions = JsonSerializer.Serialize(personOptions);
+        var serializedOptions = JsonSerializer.Serialize(options);
         await _cache.SetStringAsync(optionsRequest.SurveyOptionsId.ToString(), serializedOptions);
     }
 
@@ -62,13 +62,13 @@ public class SurveyPersonService : ISurveyPersonService
         await _cache.RemoveAsync(id.ToString());
     }
 
-    public async Task<Guid> AddOptionsAsync(SurveyPersonOptions personOptions)
+    public async Task<Guid> AddOptionsAsync(SurveyOptions options)
     {
-        var optionsRequest = _mapper.Map<SurveyOptionsCreateRequestModel>(personOptions);
+        var optionsRequest = _mapper.Map<SurveyOptionsCreateRequestModel>(options);
         var optionsId = await _surveyPersonApi.AddOptionsAsync(optionsRequest);
         
-        var serializedOptions = JsonSerializer.Serialize(personOptions);
-        await _cache.SetStringAsync(personOptions.Id.ToString(), serializedOptions);
+        var serializedOptions = JsonSerializer.Serialize(options);
+        await _cache.SetStringAsync(options.SurveyOptionsId.ToString(), serializedOptions);
 
         return optionsId;
     }

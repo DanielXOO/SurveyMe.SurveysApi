@@ -13,7 +13,7 @@ public interface ISurveysService
 
     Task<Survey> GetSurveyByIdAsync(Guid id);
 
-    Task AddSurveyAsync(Survey survey, Guid authorId, SurveyPersonOptions personOption);
+    Task AddSurveyAsync(Survey survey, Guid authorId, SurveyOptions option);
 
     Task UpdateSurveyAsync(Survey survey);
 }

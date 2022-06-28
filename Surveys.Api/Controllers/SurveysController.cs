@@ -49,7 +49,7 @@ public sealed class SurveysController : Controller
         var surveys = await _surveyService
             .GetSurveysAsync(request.Page, request.PageSize, request.SortOrder, request.NameSearchTerm);
 
-        var options = new List<SurveyPersonOptions>();
+        var options = new List<SurveyOptions>();
 
         foreach (var survey in surveys.Items)
         {
@@ -108,7 +108,7 @@ public sealed class SurveysController : Controller
             throw new BadRequestException("Invalid data", errors);
         }
 
-        var options = _mapper.Map<SurveyPersonOptions>(surveyRequest.Options);
+        var options = _mapper.Map<SurveyOptions>(surveyRequest.Options);
         var survey = _mapper.Map<Survey>(surveyRequest);
 
         await _surveyService.AddSurveyAsync(survey, authorId, options);
@@ -171,7 +171,7 @@ public sealed class SurveysController : Controller
 
         _mapper.Map(surveyRequest, survey);
 
-        var options = _mapper.Map<SurveyPersonOptions>(surveyRequest);
+        var options = _mapper.Map<SurveyOptions>(surveyRequest);
         
         await _surveyService.UpdateSurveyAsync(survey);
         await _surveyPersonService.EditSurveyPersonOptionsAsync(options);
