@@ -4,11 +4,11 @@ namespace Surveys.Services.Abstracts;
 
 public interface ISurveyPersonService
 {
-    Task<SurveyOptions> GetSurveyPersonOptionsAsync(Guid id);
+    Task<SurveyOptions> GetSurveyOptionsByIdAsync(Guid surveyId);
 
-    Task EditSurveyPersonOptionsAsync(SurveyOptions options);
+    Task EditSurveyOptionsAsync(SurveyOptions options, Guid id, Guid surveyId);
 
-    Task DeleteSurveyPersonOptionsAsync(Guid id);
+    Task DeleteSurveyOptionsAsync(Guid id, Guid surveyId);
 
-    Task<Guid> AddOptionsAsync(SurveyOptions options);
+    Task<SurveyOptions> AddSurveyOptionsAsync(SurveyOptions options, Guid surveyId);
 }

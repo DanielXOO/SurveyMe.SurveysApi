@@ -53,7 +53,7 @@ public sealed class SurveysController : Controller
 
         foreach (var survey in surveys.Items)
         {
-            var option = await _surveyPersonService.GetSurveyPersonOptionsAsync(survey.SurveyOptionId);
+            var option = await _surveyPersonService.GetSurveyOptionsByIdAsync(survey.Id);
             options.Add(option);
         }
 
@@ -111,9 +111,9 @@ public sealed class SurveysController : Controller
         var options = _mapper.Map<SurveyOptions>(surveyRequest.Options);
         var survey = _mapper.Map<Survey>(surveyRequest);
 
-        await _surveyService.AddSurveyAsync(survey, authorId, options);
+        var surveyWithOptions = await _surveyService.AddSurveyAsync(survey, authorId, options);
 
-        var surveyResponse = _mapper.Map<SurveyResponseModel>(surveyRequest);
+        var surveyResponse = _mapper.Map<SurveyResponseModel>(surveyWithOptions);
         
         return CreatedAtAction(Url.Action(nameof(GetSurvey)), surveyResponse);
     }
@@ -126,7 +126,7 @@ public sealed class SurveysController : Controller
         var survey = await _surveyService.GetSurveyByIdAsync(id);
         var surveyResponseModel = _mapper.Map<SurveyResponseModel>(survey);
         
-        var options = await _surveyPersonService.GetSurveyPersonOptionsAsync(survey.SurveyOptionId);
+        var options = await _surveyPersonService.GetSurveyOptionsByIdAsync(survey.Id);
         var optionsResponse = _mapper.Map<SurveyOptionsResponseModel>(options);
         surveyResponseModel.Options = optionsResponse;
         
@@ -141,7 +141,7 @@ public sealed class SurveysController : Controller
     {
         var survey = await _surveyService.GetSurveyByIdAsync(id);
 
-        await _surveyPersonService.DeleteSurveyPersonOptionsAsync(survey.SurveyOptionId);
+        await _surveyPersonService.DeleteSurveyOptionsAsync(survey.SurveyOptionId, survey.Id);
         await _surveyService.DeleteSurveyAsync(survey);
         
         return NoContent();
@@ -174,7 +174,7 @@ public sealed class SurveysController : Controller
         var options = _mapper.Map<SurveyOptions>(surveyRequest);
         
         await _surveyService.UpdateSurveyAsync(survey);
-        await _surveyPersonService.EditSurveyPersonOptionsAsync(options);
+        await _surveyPersonService.EditSurveyOptionsAsync(options, options.SurveyOptionsId, options.SurveyId);
 
         return NoContent();
     }

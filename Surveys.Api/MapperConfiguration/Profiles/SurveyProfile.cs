@@ -9,6 +9,7 @@ using Surveys.Api.Models.Request.Surveys;
 using Surveys.Api.Models.Response.Questions;
 using Surveys.Api.Models.Response.Surveys;
 using Surveys.Models.Surveys;
+using Surveys.Services.Models;
 
 namespace Surveys.Api.MapperConfiguration.Profiles;
 
@@ -22,6 +23,8 @@ public sealed class SurveyProfile : Profile
         CreateMap<SurveyAddRequestModel, Survey>()
             .ReverseMap();
 
+        CreateMap<SurveyWithOptions, SurveyResponseModel>();
+        
         CreateMap<SurveyAddRequestModel, SurveyResponseModel>();
         CreateMap<QuestionAddRequestModel, QuestionResponseModel>();
         CreateMap<QuestionOptionAddRequestModel, QuestionOptionResponseModel>();

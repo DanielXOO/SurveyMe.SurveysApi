@@ -1,6 +1,7 @@
 ﻿using SurveyMe.Common.Pagination;
 using Surveys.Models.SurveyOptions;
 using Surveys.Models.Surveys;
+using Surveys.Services.Models;
 
 namespace Surveys.Services.Abstracts;
 
@@ -13,7 +14,7 @@ public interface ISurveysService
 
     Task<Survey> GetSurveyByIdAsync(Guid id);
 
-    Task AddSurveyAsync(Survey survey, Guid authorId, SurveyOptions option);
+    Task<SurveyWithOptions> AddSurveyAsync(Survey survey, Guid authorId, SurveyOptions option);
 
     Task UpdateSurveyAsync(Survey survey);
 }

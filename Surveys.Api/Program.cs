@@ -45,8 +45,6 @@ builder.Services.AddMassTransit(x =>
             h.Username("guest");
             h.Password("guest");
         });
-
-        cfg.ConfigureEndpoints(context);
     });
 });
 
@@ -55,6 +53,7 @@ builder.Services.AddAutoMapper(configuration =>
     configuration.AddMaps(typeof(Program).Assembly);
     configuration.AddProfile(new QueueModelsProfile());
     configuration.AddProfile(new SurveyOptionsProfile());
+    configuration.AddProfile(new SurveyProfile());
 });
 
 builder.Services.AddScoped<ISurveysService, SurveysService>();
@@ -68,9 +67,9 @@ builder.Services.AddSingleton<ISystemClock, SystemClock>();
 
 builder.Services.AddControllers();
 
-builder.Services.AddRefitClient<ISurveyPersonApi>().ConfigureHttpClient(config =>
+builder.Services.AddRefitClient<ISurveyPersonOptionsApi>().ConfigureHttpClient(config =>
 {
-    var stringUrl = builder.Configuration.GetConnectionString("SurveyPersonApi");
+    var stringUrl = builder.Configuration.GetConnectionString("SurveyPersonOptionsApi");
     config.BaseAddress = new Uri(stringUrl);
 }).AddHttpMessageHandler<AuthorizeHandler>();
 

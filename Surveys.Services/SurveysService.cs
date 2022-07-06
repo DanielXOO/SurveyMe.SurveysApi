@@ -8,6 +8,7 @@ using Surveys.Data.Abstracts;
 using Surveys.Models.SurveyOptions;
 using Surveys.Models.Surveys;
 using Surveys.Services.Abstracts;
+using Surveys.Services.Models;
 
 namespace Surveys.Services;
 
@@ -67,25 +68,29 @@ public class SurveysService : ISurveysService
         return survey;
     }
 
-    public async Task AddSurveyAsync(Survey survey, Guid authorId, SurveyOptions options)
+    public async Task<SurveyWithOptions> AddSurveyAsync(Survey survey, Guid authorId, SurveyOptions options)
     {
         var surveyId = Guid.NewGuid();
         options.SurveyId = surveyId;
 
-        var optionsId = await _surveyPersonService.AddOptionsAsync(options);
-        
-        survey.SurveyOptionId = optionsId;
+        var surveyOptions = await _surveyPersonService.AddSurveyOptionsAsync(options, surveyId);
+
+        survey.SurveyOptionId = surveyOptions.SurveyOptionsId;
         survey.Id = surveyId;
-        
         survey.AuthorId = authorId;
         survey.LastChangeDate = _systemClock.UtcNow;
+        
         await _unitOfWork.Surveys.CreateAsync(survey);
 
         var surveyQueue = _mapper.Map<SurveyQueueModel>(survey);
-
-        surveyQueue.EventType = EventType.Create;
         
+        surveyQueue.EventType = EventType.Create;
         await _bus.Publish(surveyQueue);
+
+        var surveyWithOptions = _mapper.Map<SurveyWithOptions>(survey);
+        surveyWithOptions.Options = surveyOptions;
+
+        return surveyWithOptions;
     }
 
     public async Task UpdateSurveyAsync(Survey survey)
