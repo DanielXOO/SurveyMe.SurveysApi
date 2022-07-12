@@ -16,7 +16,7 @@ using Surveys.Services.Abstracts;
 namespace Surveys.Api.Controllers;
 
 /// <summary>
-/// Controller for surveys
+/// Controller for interaction with surveys
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
@@ -29,6 +29,12 @@ public sealed class SurveysController : Controller
 
     private readonly ISurveyPersonService _surveyPersonService;
 
+    /// <summary>
+    /// Controller's class constructor
+    /// </summary>
+    /// <param name="surveyService">service for surveys</param>
+    /// <param name="mapper">mapping class</param>
+    /// <param name="surveyPersonService">service for interaction with survey personality options</param>
     public SurveysController(ISurveysService surveyService, IMapper mapper, ISurveyPersonService surveyPersonService)
     {
         _surveyService = surveyService;
@@ -36,8 +42,14 @@ public sealed class SurveysController : Controller
         _surveyPersonService = surveyPersonService;
     }
 
-
+    /// <summary>
+    /// Endpoint for getting page with surveys
+    /// </summary>
+    /// <param name="request">Query for getting page as size, page number and etc</param>
+    /// <returns>Paginated surveys list</returns>
+    /// <exception cref="BadRequestException">Throws if query has null value</exception>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PageResponseModel<SurveyResponseModel>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BaseErrorResponse))]
     [HttpGet]
     public async Task<IActionResult> GetSurveysPage([FromQuery] GetPageRequest request)
     {
@@ -89,7 +101,12 @@ public sealed class SurveysController : Controller
         return Ok(pageResponse);
     }
     
-    //TODO: summary
+    /// <summary>
+    /// Endpoint for creation surveys
+    /// </summary>
+    /// <param name="surveyRequest">Survey model</param>
+    /// <returns>Created survey</returns>
+    /// <exception cref="BadRequestException">If surveys field invalid</exception>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BaseErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(BaseErrorResponse))]
@@ -118,6 +135,11 @@ public sealed class SurveysController : Controller
         return CreatedAtAction(Url.Action(nameof(GetSurvey)), surveyResponse);
     }
     
+    /// <summary>
+    /// Endpoint for getting survey
+    /// </summary>
+    /// <param name="id">Survey id</param>
+    /// <returns>Survey model</returns>
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(SurveyResponseModel))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BaseErrorResponse))]
     [HttpGet("{id:guid}")]
@@ -133,6 +155,10 @@ public sealed class SurveysController : Controller
         return Ok(surveyResponseModel);
     }
     
+    /// <summary>
+    /// Endpoint for delete survey
+    /// </summary>
+    /// <param name="id">Survey id</param>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status403Forbidden, Type = typeof(BaseErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(BaseErrorResponse))]
@@ -147,6 +173,13 @@ public sealed class SurveysController : Controller
         return NoContent();
     }
 
+    /// <summary>
+    /// Endpoint for edit survey
+    /// </summary>
+    /// <param name="surveyRequest">Survey edit model</param>
+    /// <param name="id">Survey id</param>
+    /// <exception cref="BadRequestException">Throws if ids do not match</exception>
+    /// <exception cref="ForbidException">If user try edit someone else's survey</exception>
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(BaseErrorResponse))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(BaseErrorResponse))]

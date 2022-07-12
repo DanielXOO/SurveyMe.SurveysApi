@@ -34,7 +34,11 @@ builder.Services.AddControllers()
     });
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    var filePath = Path.Combine(AppContext.BaseDirectory, "Surveys.Api.xml");
+    options.IncludeXmlComments(filePath);
+});
 
 builder.Services.AddMassTransit(x =>
 {
@@ -59,6 +63,7 @@ builder.Services.AddAutoMapper(configuration =>
 builder.Services.AddScoped<ISurveysService, SurveysService>();
 builder.Services.AddScoped<ISurveysUnitOfWork, SurveysUnitOfWork>();
 builder.Services.AddScoped<ISurveyPersonService, SurveyPersonService>();
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<AuthorizeHandler>();
@@ -69,9 +74,15 @@ builder.Services.AddControllers();
 
 builder.Services.AddRefitClient<ISurveyPersonOptionsApi>().ConfigureHttpClient(config =>
 {
-    var stringUrl = builder.Configuration.GetConnectionString("SurveyPersonOptionsApi");
+    var stringUrl = builder.Configuration.GetConnectionString("GatewayURL");
     config.BaseAddress = new Uri(stringUrl);
 }).AddHttpMessageHandler<AuthorizeHandler>();
+
+builder.Services.AddRefitClient<IAuthenticationApi>().ConfigureHttpClient(config =>
+{
+    var stringUrl = builder.Configuration.GetConnectionString("GatewayURL");
+    config.BaseAddress = new Uri(stringUrl);
+});
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
@@ -83,9 +94,8 @@ builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.Authenti
     {
         options.Authority = "https://localhost:7179";
         options.RequireHttpsMetadata = false;
-        options.ApiName = "SurveyMeApi";
-        options.ApiSecret = "api_secret";
-        options.JwtValidationClockSkew = TimeSpan.FromDays(1);
+        options.ApiName = "Survey.Api";
+        options.ApiSecret = "survey_secret";
     });
 
 var app = builder.Build();
