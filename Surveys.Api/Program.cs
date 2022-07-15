@@ -92,7 +92,7 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
     .AddIdentityServerAuthentication(options =>
     {
-        options.Authority = "https://localhost:7179";
+        options.Authority = "https://authentication-api:5001";
         options.RequireHttpsMetadata = false;
         options.ApiName = "Survey.Api";
         options.ApiSecret = "survey_secret";
