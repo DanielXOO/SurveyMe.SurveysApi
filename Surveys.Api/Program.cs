@@ -22,9 +22,10 @@ builder.Host.ConfigureLogging(logBuilder =>
     logBuilder.AddFile(builder.Configuration.GetSection("Serilog:FileLogging"));
 });
 
+var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
+
 builder.Services.AddDbContext<SurveysDbContext>(options
-    => options.UseSqlServer(builder.Configuration
-        .GetConnectionString("DefaultConnection")));
+    => options.UseSqlServer(connectionString));
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddControllers()
