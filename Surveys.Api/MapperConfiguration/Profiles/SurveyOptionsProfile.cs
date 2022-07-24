@@ -12,7 +12,9 @@ public class SurveyOptionsProfile : Profile
     public SurveyOptionsProfile()
     {
         CreateMap<SurveyOptionsCreateRequestModel, SurveyOptions>();
+        CreateMap<SurveyOptionsEditRequestModel, SurveyOptions>().ReverseMap();
         CreateMap<PersonalityOptionCreateRequestModel, PersonalityOption>();
+        CreateMap<PersonalityOptionEditRequestModel, PersonalityOption>().ReverseMap();
         CreateMap<SurveyOptionsResponseModel, SurveyOptions>().ReverseMap();
         CreateMap<PersonalityOptionResponseModel, PersonalityOption>().ReverseMap();
     }
