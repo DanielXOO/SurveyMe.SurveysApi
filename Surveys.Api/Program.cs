@@ -87,13 +87,13 @@ builder.Services.AddRefitClient<IAuthenticationApi>().ConfigureHttpClient(config
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = builder.Configuration.GetConnectionString("RedisHost");
+    options.Configuration = "survey-api-cache";
 });
 
 builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
     .AddIdentityServerAuthentication(options =>
     {
-        options.Authority = "https://authentication-api:5001";
+        options.Authority = "http://authentication-api";
         options.RequireHttpsMetadata = false;
         options.ApiName = "Survey.Api";
         options.ApiSecret = "survey_secret";

@@ -204,7 +204,7 @@ public sealed class SurveysController : Controller
 
         _mapper.Map(surveyRequest, survey);
 
-        var options = _mapper.Map<SurveyOptions>(surveyRequest);
+        var options = _mapper.Map<SurveyOptions>(surveyRequest.Options);
         
         await _surveyService.UpdateSurveyAsync(survey);
         await _surveyPersonService.EditSurveyOptionsAsync(options, options.SurveyOptionsId, options.SurveyId);
