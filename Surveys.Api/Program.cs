@@ -22,7 +22,7 @@ builder.Host.ConfigureLogging(logBuilder =>
     logBuilder.AddFile(builder.Configuration.GetSection("Serilog:FileLogging"));
 });
 
-var connectionString = Environment.GetEnvironmentVariable("ConnectionString");
+var connectionString = "Server=DESKTOP-KP79CHK;Database=SurveysDb;Trusted_Connection=True;MultipleActiveResultSets=true";
 
 builder.Services.AddDbContext<SurveysDbContext>(options
     => options.UseSqlServer(connectionString));
@@ -45,7 +45,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.Host("rabbitmq", "/", h =>
+        cfg.Host("localhost", "/", h =>
         {
             h.Username("guest");
             h.Password("guest");
