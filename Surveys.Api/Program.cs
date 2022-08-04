@@ -90,6 +90,8 @@ builder.Services.AddStackExchangeRedisCache(options =>
     options.Configuration = "survey-api-cache";
 });
 
+builder.Services.AddCors();
+
 builder.Services.AddAuthentication(IdentityServerAuthenticationDefaults.AuthenticationScheme)
     .AddIdentityServerAuthentication(options =>
     {
@@ -114,6 +116,11 @@ app.UseCustomExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseRouting();
+
+app.UseCors(options => options
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod());
 
 app.UseAuthentication();
 app.UseAuthorization();
